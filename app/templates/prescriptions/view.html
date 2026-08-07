@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Prescription · {{ prescription.prescription_code }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-prescription"></i> Prescription Details</h1>
+    <a href="/prescriptions" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="profile-card">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <i class="fas fa-prescription-bottle-alt"></i>
+      </div>
+
+      <div class="profile-title">
+        <h2>{{ prescription.prescription_code }}</h2>
+        <p>{{ prescription.diagnosis }}</p>
+        <span class="status-badge {% if prescription.is_active %}active{% else %}inactive{% endif %}">
+          {% if prescription.is_active %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Profile Body -->
+    <div class="profile-body">
+      <div class="info-grid">
+        <!-- Patient -->
+        <div class="info-item">
+          <label><i class="fas fa-user"></i> Patient</label>
+          <p><strong>{{ prescription.patient.name }}</strong></p>
+          <small>Code: {{ prescription.patient.patient_code }}</small>
+        </div>
+
+        <!-- Doctor -->
+        <div class="info-item">
+          <label><i class="fas fa-user-md"></i> Doctor</label>
+          <p><strong>{{ prescription.doctor.name }}</strong></p>
+          <small>{{ prescription.doctor.specialization }}</small>
+        </div>
+
+        <!-- Diagnosis -->
+        <div class="info-item full-width">
+          <label><i class="fas fa-stethoscope"></i> Diagnosis</label>
+          <p>{{ prescription.diagnosis }}</p>
+        </div>
+
+        <!-- Medicines -->
+        {% if prescription.medicines %}
+        <div class="info-item full-width">
+          <label><i class="fas fa-pills"></i> Medicines</label>
+          <pre style="white-space: pre-wrap; margin: 0;">{{ prescription.medicines }}</pre>
+        </div>
+        {% endif %}
+
+        <!-- Dosage Instructions -->
+        {% if prescription.dosage_instructions %}
+        <div class="info-item full-width">
+          <label><i class="fas fa-info-circle"></i> Dosage Instructions</label>
+          <p>{{ prescription.dosage_instructions }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Valid Until -->
+        <div class="info-item">
+          <label><i class="fas fa-calendar-alt"></i> Valid Until</label>
+          <p>{{ prescription.valid_until.strftime('%B %d, %Y') if prescription.valid_until else 'No expiry' }}</p>
+        </div>
+
+        <!-- Follow-up Date -->
+        {% if prescription.follow_up_date %}
+        <div class="info-item">
+          <label><i class="fas fa-calendar-check"></i> Follow-up Date</label>
+          <p>{{ prescription.follow_up_date.strftime('%B %d, %Y') }}</p>
+        </div>
+
+        <!-- Follow-up Notes -->
+        <div class="info-item">
+          <label><i class="fas fa-comment-medical"></i> Follow-up Notes</label>
+          <p>{{ prescription.follow_up_notes or 'No notes' }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Additional Notes -->
+        {% if prescription.notes %}
+        <div class="info-item full-width">
+          <label><i class="fas fa-comment"></i> Notes</label>
+          <p>{{ prescription.notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="profile-actions">
+      <a href="/prescriptions/edit/{{ prescription.id }}" class="btn-primary">
+        <i class="fas fa-edit"></i> Edit Prescription
+      </a>
+
+      <a href="/prescriptions" class="btn-secondary">
+        <i class="fas fa-list"></i> Back to List
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

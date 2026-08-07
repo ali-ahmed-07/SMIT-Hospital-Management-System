@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment · {{ appointment.appointment_code }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-calendar-check"></i> Appointment Details</h1>
+    <a href="/appointments" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="profile-card">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <i class="fas fa-calendar-day"></i>
+      </div>
+
+      <div class="profile-title">
+        <h2>{{ appointment.appointment_code }}</h2>
+        <p>{{ appointment.reason }}</p>
+        <span class="status-badge {% if appointment.status == 'scheduled' %}scheduled{% elif appointment.status == 'confirmed' %}confirmed{% elif appointment.status == 'in-progress' %}in-progress{% elif appointment.status == 'completed' %}completed{% elif appointment.status == 'cancelled' %}cancelled{% else %}no-show{% endif %}">
+          {{ appointment.status|title }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Profile Body -->
+    <div class="profile-body">
+      <div class="info-grid">
+        <!-- Patient -->
+        <div class="info-item">
+          <label><i class="fas fa-user"></i> Patient</label>
+          <p><strong>{{ appointment.patient.name }}</strong></p>
+          <small>Code: {{ appointment.patient.patient_code }}</small>
+        </div>
+
+        <!-- Doctor -->
+        <div class="info-item">
+          <label><i class="fas fa-user-md"></i> Doctor</label>
+          <p><strong>Dr. {{ appointment.doctor.name }}</strong></p>
+          <small>{{ appointment.doctor.specialization }}</small>
+        </div>
+
+        <!-- Staff -->
+        {% if appointment.staff %}
+        <div class="info-item">
+          <label><i class="fas fa-user-nurse"></i> Staff</label>
+          <p><strong>{{ appointment.staff.name }}</strong></p>
+          <small>{{ appointment.staff.role }}</small>
+        </div>
+        {% endif %}
+
+        <!-- Date & Time -->
+        <div class="info-item">
+          <label><i class="fas fa-calendar-alt"></i> Date & Time</label>
+          <p><strong>{{ appointment.appointment_date.strftime('%B %d, %Y') }}</strong></p>
+          <small>{{ appointment.appointment_time.strftime('%I:%M %p') }}</small>
+        </div>
+
+        <!-- Reason -->
+        <div class="info-item full-width">
+          <label><i class="fas fa-notes-medical"></i> Reason for Visit</label>
+          <p>{{ appointment.reason }}</p>
+        </div>
+
+        <!-- Symptoms -->
+        {% if appointment.symptoms %}
+        <div class="info-item full-width">
+          <label><i class="fas fa-list-ul"></i> Symptoms</label>
+          <p>{{ appointment.symptoms }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Notes -->
+        {% if appointment.notes %}
+        <div class="info-item full-width">
+          <label><i class="fas fa-comment"></i> Notes</label>
+          <p>{{ appointment.notes }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Follow-up -->
+        {% if appointment.follow_up_date %}
+        <div class="info-item">
+          <label><i class="fas fa-calendar-check"></i> Follow-up Date</label>
+          <p>{{ appointment.follow_up_date.strftime('%B %d, %Y') }}</p>
+        </div>
+
+        <div class="info-item">
+          <label><i class="fas fa-comment-medical"></i> Follow-up Notes</label>
+          <p>{{ appointment.follow_up_notes or 'No notes' }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="profile-actions">
+      <a href="/appointments/edit/{{ appointment.id }}" class="btn-primary">
+        <i class="fas fa-edit"></i> Edit Appointment
+      </a>
+      
+      <form action="/appointments/update-status/{{ appointment.id }}" method="POST" style="display: inline-block;">
+        <select name="status" onchange="this.form.submit()" class="btn-secondary" style="padding: 10px 20px;">
+          <option value="">Update Status</option>
+          <option value="confirmed" {% if appointment.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+          <option value="in-progress" {% if appointment.status == 'in-progress' %}selected{% endif %}>In Progress</option>
+          <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Completed</option>
+          <option value="cancelled" {% if appointment.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          <option value="no-show" {% if appointment.status == 'no-show' %}selected{% endif %}>No Show</option>
+        </select>
+      </form>
+
+      <a href="/appointments" class="btn-secondary">
+        <i class="fas fa-list"></i> Back to List
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

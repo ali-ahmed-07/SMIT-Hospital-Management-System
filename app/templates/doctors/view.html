@@ -1,0 +1,42 @@
+<!-- ==================== VIEW / DETAILS ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Doctor Details · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-user-md"></i> Doctor Details</h1>
+    <a href="/doctors" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-user-circle"></i></div>
+      <div class="profile-title">
+        <h2>{{ doctor.name }}</h2>
+        <p class="specialization">{{ doctor.specialization }}</p>
+        <span class="status-badge {% if doctor.status == 1 %}active{% else %}inactive{% endif %}">
+          {% if doctor.status == 1 %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="info-grid">
+        <div class="info-item"><label>Doctor Code</label><p><span class="badge">{{ doctor.doctor_code }}</span></p></div>
+        <div class="info-item"><label>Email</label><p><i class="fas fa-envelope"></i> {{ doctor.email }}</p></div>
+        <div class="info-item"><label>Phone</label><p><i class="fas fa-phone"></i> {{ doctor.phone }}</p></div>
+        <div class="info-item"><label>Salary</label><p><i class="fas fa-dollar-sign"></i> ${{ doctor.salary }}</p></div>
+        <div class="info-item"><label>Gender</label><p><i class="fas fa-venus-mars"></i> {{ doctor.gender }}</p></div>
+        <div class="info-item"><label>Address</label><p><i class="fas fa-map-marker-alt"></i> {{ doctor.address or 'Not provided' }}</p></div>
+        <div class="info-item"><label>Created At</label><p><i class="fas fa-calendar-plus"></i> {{ doctor.created_at.strftime('%Y-%m-%d %H:%M:%S') if doctor.created_at else 'N/A' }}</p></div>
+        <div class="info-item"><label>Last Updated</label><p><i class="fas fa-calendar-check"></i> {{ doctor.updated_at.strftime('%Y-%m-%d %H:%M:%S') if doctor.updated_at else 'N/A' }}</p></div>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="/doctors/edit/{{ doctor.id }}" class="btn-primary"><i class="fas fa-edit"></i> Edit Doctor</a>
+      <a href="/doctors" class="btn-secondary"><i class="fas fa-list"></i> Back to List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

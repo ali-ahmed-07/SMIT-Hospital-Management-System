@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Prescription Management · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-prescription"></i> Prescription Management</h1>
+    <a href="/prescriptions/add" class="btn-primary"><i class="fas fa-plus"></i> New Prescription</a>
+  </div>
+
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Prescription Code</th>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Diagnosis</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prescription in prescriptions %}
+        <tr>
+          <td>{{ prescription.id }}</td>
+          <td><span class="badge">{{ prescription.prescription_code }}</span></td>
+          <td>
+  
+              <strong>{{ prescription.patient.name }}</strong>
+          </td>
+          <td>{{ prescription.doctor.name }}</td>
+          <td>{{ prescription.diagnosis[:50] }}{% if prescription.diagnosis|length > 50 %}...{% endif %}</td>
+          <td>{{ prescription.prescription_date.strftime('%Y-%m-%d') }}</td>
+          <td>
+            <span class="status-badge {% if prescription.is_active %}active{% else %}inactive{% endif %}">
+              {% if prescription.is_active %}Active{% else %}Inactive{% endif %}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <a href="/prescriptions/view/{{ prescription.id }}" class="btn-icon view" title="View"><i class="fas fa-eye"></i></a>
+              <a href="/prescriptions/edit/{{ prescription.id }}" class="btn-icon edit" title="Edit"><i class="fas fa-edit"></i></a>
+              <form action="/prescriptions/toggle-status/{{ prescription.id }}" method="POST">
+                <button type="submit" class="btn-icon toggle" title="Toggle Status">
+                  <i class="fas {% if prescription.is_active %}fa-pause{% else %}fa-play{% endif %}"></i>
+                </button>
+              </form>
+              <form action="/prescriptions/delete/{{ prescription.id }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this prescription?');">
+                <button type="submit" class="btn-icon delete" title="Delete"><i class="fas fa-trash"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  {% if not prescriptions %}
+  <div class="empty-state">
+    <i class="fas fa-prescription-bottle"></i>
+    <p>No prescriptions found. Click "New Prescription" to create one.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

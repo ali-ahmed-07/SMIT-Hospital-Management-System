@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}New Appointment · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-calendar-plus"></i> New Appointment</h1>
+    <a href="/appointments" class="btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i> {{ error }}
+  </div>
+  {% endif %}
+
+  <div class="form-container">
+    <form action="/appointments/add" method="POST">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Patient <span class="required">*</span></label>
+          <select name="patient_id" required>
+            <option value="">Select Patient</option>
+            {% for patient in patients %}
+            <option value="{{ patient.id }}" {% if selected_patient and selected_patient.id == patient.id %}selected{% endif %}>
+              {{ patient.name }} ({{ patient.patient_code }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Doctor <span class="required">*</span></label>
+          <select name="doctor_id" required>
+            <option value="">Select Doctor</option>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.id }}" {% if selected_doctor and selected_doctor.id == doctor.id %}selected{% endif %}>
+              Dr. {{ doctor.name }} ({{ doctor.specialization }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Staff Member</label>
+          <select name="staff_id">
+            <option value="">Select Staff (Optional)</option>
+            {% for staff in staff_members %}
+            <option value="{{ staff.id }}">
+              {{ staff.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Appointment Date <span class="required">*</span></label>
+          <input type="date" name="appointment_date" value="{{ today }}" required />
+        </div>
+
+        <div class="form-group">
+          <label>Appointment Time <span class="required">*</span></label>
+          <input type="time" name="appointment_time" value="09:00"  />
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="scheduled">Scheduled</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="no-show">No Show</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Reason for Visit <span class="required">*</span></label>
+          <textarea name="reason" rows="2" placeholder="Brief reason for appointment" required></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Symptoms</label>
+          <textarea name="symptoms" rows="3" placeholder="Describe symptoms (optional)"></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Notes</label>
+          <textarea name="notes" rows="2" placeholder="Additional notes (optional)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Follow-up Date</label>
+          <input type="date" name="follow_up_date" />
+        </div>
+
+        <div class="form-group">
+          <label>Follow-up Notes</label>
+          <input type="text" name="follow_up_notes" placeholder="Follow-up instructions..." />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Create Appointment
+        </button>
+        <a href="/appointments" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

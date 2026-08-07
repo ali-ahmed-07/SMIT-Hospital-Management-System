@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Details · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-user"></i> Staff Details</h1>
+    <a href="/staff" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-user-circle"></i></div>
+      <div class="profile-title">
+        <h2>{{ staff.name }}</h2>
+        <p class="specialization">{{ staff.designation }} - {{ staff.department }}</p>
+        <span class="status-badge {% if staff.status == 1 %}active{% else %}inactive{% endif %}">
+          {% if staff.status == 1 %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="info-grid">
+        <div class="info-item"><label>Staff Code</label><p><span class="badge">{{ staff.staff_code }}</span></p></div>
+        <div class="info-item"><label>Email</label><p><i class="fas fa-envelope"></i> {{ staff.email }}</p></div>
+        <div class="info-item"><label>Phone</label><p><i class="fas fa-phone"></i> {{ staff.phone }}</p></div>
+        <div class="info-item"><label>Department</label><p><i class="fas fa-building"></i> {{ staff.department }}</p></div>
+        <div class="info-item"><label>Designation</label><p><i class="fas fa-briefcase"></i> {{ staff.designation }}</p></div>
+        <div class="info-item"><label>Works Under</label><p><i class="fas fa-user-md"></i> {{ staff.doctor.name if staff.doctor else 'Not assigned' }}</p></div>
+        <div class="info-item"><label>Salary</label><p><i class="fas fa-money-bill-wave"></i> ${{ "%.2f"|format(staff.salary) }}</p></div>
+        <div class="info-item"><label>Joining Date</label><p><i class="fas fa-calendar-plus"></i> {{ staff.joining_date.strftime('%Y-%m-%d') if staff.joining_date else 'N/A' }}</p></div>
+        <div class="info-item"><label>Address</label><p><i class="fas fa-map-marker-alt"></i> {{ staff.address or 'Not provided' }}</p></div>
+        <div class="info-item"><label>Created At</label><p><i class="fas fa-calendar-plus"></i> {{ staff.created_at.strftime('%Y-%m-%d %H:%M:%S') if staff.created_at else 'N/A' }}</p></div>
+        <div class="info-item"><label>Last Updated</label><p><i class="fas fa-calendar-check"></i> {{ staff.updated_at.strftime('%Y-%m-%d %H:%M:%S') if staff.updated_at else 'N/A' }}</p></div>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="/staff/edit/{{ staff.id }}" class="btn-primary"><i class="fas fa-edit"></i> Edit Staff</a>
+      <a href="/staff" class="btn-secondary"><i class="fas fa-list"></i> Back to List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

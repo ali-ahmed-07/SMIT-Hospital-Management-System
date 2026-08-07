@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Patient · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-user-plus"></i> Add New Patient</h1>
+    <a href="/patients" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  {% if error %}
+  <div class="alert">
+    <i class="fas fa-exclamation-circle"></i> {{ error }}
+  </div>
+  {% endif %}
+
+  <div class="form-container">
+    <form action="/patients/add" method="POST">
+      <div class="form-grid">
+        <div class="form-group">
+  <label>Patient Code</label>
+  <input type="text" value="{{ next_code }}" disabled />
+  <small>Auto-generated</small>
+</div>
+        <div class="form-group">
+          <label>Full Name <span class="required">*</span></label>
+          <input type="text" name="name" placeholder="Enter patient name" required />
+        </div>
+        <div class="form-group">
+          <label>Age <span class="required">*</span></label>
+          <input type="number" name="age" placeholder="e.g., 35" min="0" max="150" required />
+        </div>
+        <div class="form-group">
+          <label>Gender <span class="required">*</span></label>
+          <select name="gender" required>
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Disease <span class="required">*</span></label>
+          <input type="text" name="disease" placeholder="e.g., Diabetes" required />
+        </div>
+        <div class="form-group">
+          <label>Doctor <span class="required">*</span></label>
+          <select name="doctor_id" required>
+            <option value="">Select Doctor</option>
+            {% for doctor in doctors %}
+            <option value="{{ doctor.id }}">{{ doctor.name }} ({{ doctor.specialization }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Phone <span class="required">*</span></label>
+          <input type="text" name="phone" placeholder="+1 234 567 890" required />
+        </div>
+        <div class="form-group">
+          <label>Admission Date <span class="required">*</span></label>
+          <input type="date" name="admission_date" required />
+        </div>
+        <div class="form-group">
+          <label>Discharge Date <span class="required">*</span></label>
+          <input type="date" name="discharge_date" required />
+          <small>Leave empty if patient is still admitted</small>
+        </div>
+        <div class="form-group full-width">
+          <label>Address</label>
+          <textarea name="address" rows="3" placeholder="Enter patient address"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Patient</button>
+        <a href="/patients" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

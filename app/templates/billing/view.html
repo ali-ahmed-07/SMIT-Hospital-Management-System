@@ -1,0 +1,88 @@
+<!-- ==================== VIEW BILL / INVOICE ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Bill Details · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-file-invoice-dollar"></i> Bill - {{ bill.bill_code }}</h1>
+    <div>
+      <a href="/billing/edit/{{ bill.id }}" class="btn-secondary"><i class="fas fa-edit"></i> Edit</a>
+      <a href="/billing" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-file-invoice-dollar"></i></div>
+      <div class="profile-title">
+        <h2>{{ bill.bill_code }}</h2>
+        <p class="specialization">{{ bill.bill_date }}</p>
+        <span class="status-badge {% if bill.payment_status == 'paid' %}active{% elif bill.payment_status == 'partial' %}pending{% else %}inactive{% endif %}">
+          {{ bill.payment_status|capitalize }}
+        </span>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="info-grid">
+        <div class="info-item"><label>Patient</label><p><i class="fas fa-user"></i> {{ bill.patient.name if bill.patient else '-' }}</p></div>
+        <div class="info-item"><label>Doctor</label><p><i class="fas fa-user-md"></i> {{ bill.doctor.name if bill.doctor else '-' }}</p></div>
+        <div class="info-item"><label>Payment Method</label><p><i class="fas fa-credit-card"></i> {{ bill.payment_method or 'Not specified' }}</p></div>
+        <div class="info-item"><label>Related Appointment</label><p><i class="fas fa-calendar"></i> {{ bill.appointment.appointment_code if bill.appointment else 'N/A' }}</p></div>
+      </div>
+
+      <h3 style="margin-top:25px;">Items</h3>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            {% for item in bill.items %}
+            <tr>
+              <td>{{ item.description }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td>${{ "%.2f"|format(item.amount) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-grid" style="margin-top:20px;">
+        <div class="info-item"><label>Subtotal</label><p>${{ "%.2f"|format(bill.subtotal) }}</p></div>
+        <div class="info-item"><label>Discount ({{ bill.discount_percent }}%)</label><p>-${{ "%.2f"|format(bill.discount_amount) }}</p></div>
+        <div class="info-item"><label>Tax ({{ bill.tax_percent }}%)</label><p>+${{ "%.2f"|format(bill.tax_amount) }}</p></div>
+        <div class="info-item"><label><strong>Total</strong></label><p><strong>${{ "%.2f"|format(bill.total_amount) }}</strong></p></div>
+        <div class="info-item"><label>Paid</label><p>${{ "%.2f"|format(bill.paid_amount) }}</p></div>
+        <div class="info-item"><label>Due</label><p style="color:{% if bill.due_amount > 0 %}#e74c3c{% else %}#27ae60{% endif %};"><strong>${{ "%.2f"|format(bill.due_amount) }}</strong></p></div>
+      </div>
+
+      {% if bill.notes %}
+      <div class="info-item" style="margin-top:15px;"><label>Notes</label><p>{{ bill.notes }}</p></div>
+      {% endif %}
+    </div>
+
+    {% if bill.due_amount > 0 %}
+    <div class="form-container" style="margin-top:10px;">
+      <h3>Record a Payment</h3>
+      <form action="/billing/pay/{{ bill.id }}" method="POST" style="display:flex; gap:10px; align-items:end;">
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" name="amount" step="0.01" min="0.01" max="{{ bill.due_amount }}" required>
+        </div>
+        <button type="submit" class="btn-primary"><i class="fas fa-money-bill"></i> Add Payment</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="profile-actions">
+      <a href="/billing/edit/{{ bill.id }}" class="btn-primary"><i class="fas fa-edit"></i> Edit Bill</a>
+      <a href="/billing" class="btn-secondary"><i class="fas fa-list"></i> Back to List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

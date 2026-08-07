@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Details · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-user"></i> Patient Details</h1>
+    <a href="/patients" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-user-circle"></i></div>
+      <div class="profile-title">
+        <h2>{{ patient.name }}</h2>
+        <p class="specialization">{{ patient.disease }}</p>
+        <span class="status-badge {% if patient.status == 1 %}active{% else %}inactive{% endif %}">
+          {% if patient.status == 1 %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="info-grid">
+        <div class="info-item"><label>Patient Code</label><p><span class="badge">{{ patient.patient_code }}</span></p></div>
+        <div class="info-item"><label>Age</label><p><i class="fas fa-calendar-alt"></i> {{ patient.age }} years</p></div>
+        <div class="info-item"><label>Gender</label><p><i class="fas fa-venus-mars"></i> {{ patient.gender }}</p></div>
+        <div class="info-item"><label>Disease</label><p><i class="fas fa-notes-medical"></i> {{ patient.disease }}</p></div>
+        <div class="info-item"><label>Doctor</label><p><i class="fas fa-user-md"></i> {{ patient.doctor.name if patient.doctor else 'Not assigned' }}</p></div>
+        <div class="info-item"><label>Phone</label><p><i class="fas fa-phone"></i> {{ patient.phone }}</p></div>
+        <div class="info-item"><label>Admission Date</label><p><i class="fas fa-calendar-plus"></i> {{ patient.admission_date.strftime('%Y-%m-%d') if patient.admission_date else 'N/A' }}</p></div>
+        <div class="info-item"><label>Discharge Date</label><p><i class="fas fa-calendar-check"></i> {{ patient.discharge_date.strftime('%Y-%m-%d') if patient.discharge_date else 'Still Admitted' }}</p></div>
+        <div class="info-item"><label>Address</label><p><i class="fas fa-map-marker-alt"></i> {{ patient.address or 'Not provided' }}</p></div>
+        <div class="info-item"><label>Created At</label><p><i class="fas fa-calendar-plus"></i> {{ patient.created_at.strftime('%Y-%m-%d %H:%M:%S') if patient.created_at else 'N/A' }}</p></div>
+        <div class="info-item"><label>Last Updated</label><p><i class="fas fa-calendar-check"></i> {{ patient.updated_at.strftime('%Y-%m-%d %H:%M:%S') if patient.updated_at else 'N/A' }}</p></div>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="/patients/edit/{{ patient.id }}" class="btn-primary"><i class="fas fa-edit"></i> Edit Patient</a>
+      <a href="/patients" class="btn-secondary"><i class="fas fa-list"></i> Back to List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

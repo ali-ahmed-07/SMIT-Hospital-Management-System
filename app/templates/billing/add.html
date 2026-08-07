@@ -1,0 +1,185 @@
+<!-- ==================== CREATE BILL ==================== -->
+{% extends "base.html" %}
+
+{% block title %}Create Bill · MediTrack{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="fas fa-file-invoice-dollar"></i> Create Bill</h1>
+    <a href="/billing" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  {% if error %}
+  <div class="alert"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+  {% endif %}
+
+  <div class="form-container">
+    <form action="/billing/add" method="POST" id="billForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Patient <span class="required">*</span></label>
+          <select name="patient_id" required>
+            <option value="">Select Patient</option>
+            {% for p in patients %}
+            <option value="{{ p.id }}" {% if selected_patient_id and selected_patient_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Doctor <span class="required">*</span></label>
+          <select name="doctor_id" required>
+            <option value="">Select Doctor</option>
+            {% for d in doctors %}
+            <option value="{{ d.id }}">{{ d.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Related Appointment (optional)</label>
+          <select name="appointment_id">
+            <option value="">None</option>
+            {% for a in appointments %}
+            <option value="{{ a.id }}" {% if selected_appointment_id and selected_appointment_id == a.id %}selected{% endif %}>
+              {{ a.appointment_code }} - {{ a.appointment_date }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bill Date <span class="required">*</span></label>
+          <input type="date" name="bill_date" value="{{ today }}" required />
+        </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select name="payment_method">
+            <option value="">Select</option>
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+            <option value="insurance">Insurance</option>
+            <option value="online">Online</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ===== Billing Items ===== -->
+      <h3 style="margin-top:25px;">Bill Items</h3>
+      <div class="table-container">
+        <table class="table" id="itemsTable">
+          <thead>
+            <tr>
+              <th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="item-row">
+              <td><div class="form-group"><input type="text" name="description[]" placeholder="e.g. Consultation Fee" class="item-desc" required></div></td>
+              <td><div class="form-group"><input type="number" name="quantity[]" value="1" min="0" step="0.01" class="item-qty"></div></td>
+              <td><div class="form-group"><input type="number" name="unit_price[]" value="0" min="0" step="0.01" class="item-price"></div></td>
+              <td class="item-amount">0.00</td>
+              <td><button type="button" class="btn-icon delete remove-row"><i class="fas fa-trash"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" id="addRow" class="btn-secondary" style="margin-top:10px;">
+        <i class="fas fa-plus"></i> Add Item
+      </button>
+
+      <!-- ===== Totals ===== -->
+      <div class="form-grid" style="margin-top:25px;">
+        <div class="form-group">
+          <label>Discount (%)</label>
+          <input type="number" id="discountPercent" name="discount_percent" value="0" min="0" max="100" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Tax (%)</label>
+          <input type="number" id="taxPercent" name="tax_percent" value="0" min="0" max="100" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Paid Amount</label>
+          <input type="number" id="paidAmount" name="paid_amount" value="0" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="profile-card" style="margin-top:15px; padding:20px;">
+        <div class="info-grid">
+          <div class="info-item"><label>Subtotal</label><p id="sumSubtotal">$0.00</p></div>
+          <div class="info-item"><label>Discount Amount</label><p id="sumDiscount">$0.00</p></div>
+          <div class="info-item"><label>Tax Amount</label><p id="sumTax">$0.00</p></div>
+          <div class="info-item"><label><strong>Total</strong></label><p id="sumTotal"><strong>$0.00</strong></p></div>
+          <div class="info-item"><label>Due Amount</label><p id="sumDue">$0.00</p></div>
+        </div>
+      </div>
+
+      <div class="form-group full-width" style="margin-top:15px;">
+        <label>Notes</label>
+        <textarea name="notes" rows="3" placeholder="Any additional notes..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Bill</button>
+        <a href="/billing" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function recalc() {
+  let subtotal = 0;
+  document.querySelectorAll('#itemsTable .item-row').forEach(row => {
+    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+    const amount = qty * price;
+    row.querySelector('.item-amount').textContent = amount.toFixed(2);
+    subtotal += amount;
+  });
+
+  const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+  const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
+  const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+
+  const discountAmount = subtotal * discountPercent / 100;
+  const taxable = subtotal - discountAmount;
+  const taxAmount = taxable * taxPercent / 100;
+  const total = taxable + taxAmount;
+  const due = Math.max(total - paidAmount, 0);
+
+  document.getElementById('sumSubtotal').textContent = '$' + subtotal.toFixed(2);
+  document.getElementById('sumDiscount').textContent = '$' + discountAmount.toFixed(2);
+  document.getElementById('sumTax').textContent = '$' + taxAmount.toFixed(2);
+  document.getElementById('sumTotal').innerHTML = '<strong>$' + total.toFixed(2) + '</strong>';
+  document.getElementById('sumDue').textContent = '$' + due.toFixed(2);
+}
+
+function addRowHandlers(row) {
+  row.querySelectorAll('.item-qty, .item-price').forEach(el => el.addEventListener('input', recalc));
+  row.querySelector('.remove-row').addEventListener('click', () => {
+    if (document.querySelectorAll('#itemsTable .item-row').length > 1) {
+      row.remove();
+      recalc();
+    }
+  });
+}
+
+document.querySelectorAll('#itemsTable .item-row').forEach(addRowHandlers);
+
+document.getElementById('addRow').addEventListener('click', () => {
+  const tbody = document.querySelector('#itemsTable tbody');
+  const newRow = tbody.querySelector('.item-row').cloneNode(true);
+  newRow.querySelector('.item-desc').value = '';
+  newRow.querySelector('.item-qty').value = 1;
+  newRow.querySelector('.item-price').value = 0;
+  newRow.querySelector('.item-amount').textContent = '0.00';
+  tbody.appendChild(newRow);
+  addRowHandlers(newRow);
+});
+
+document.getElementById('discountPercent').addEventListener('input', recalc);
+document.getElementById('taxPercent').addEventListener('input', recalc);
+document.getElementById('paidAmount').addEventListener('input', recalc);
+
+recalc();
+</script>
+{% endblock %}
