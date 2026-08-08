@@ -26,7 +26,7 @@ from app.models.patient import Patient
 from app.models.staff import Staff
 from app.models.prescription import Prescription
 from app.models.appointment import Appointment
-from app.models.billing import Bill, BillItem
+from app.models.billing import Bill
 
 
 def create_tables():
@@ -79,97 +79,88 @@ async def startup():
     print("Database tables created successfully!")
 
 
-# Home
+# ================================================================
+# HOME
+# ================================================================
+
 @app.get("/", response_class=HTMLResponse)
 async def home():
+
     return """
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
+
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <title>Hospital Management System</title>
 
         <style>
+
+            * {
+                box-sizing: border-box;
+            }
+
             body {
                 font-family: Arial, sans-serif;
-                margin: 50px;
+                margin: 0;
+                background: linear-gradient(135deg, #f4fbf8 0%, #e5f6f0 50%, #d2eee5 100%);
+                padding: 50px 20px;
                 text-align: center;
-                background: #f5f7fa;
             }
 
             .container {
-                max-width: 800px;
+                max-width: 850px;
                 margin: 0 auto;
                 background: white;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                padding: 45px;
+                border-radius: 9px;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
             }
 
             h1 {
-                color: #2c3e50;
-            }
-
-            .btn {
-                display: inline-block;
-                padding: 12px 30px;
-                background: #3498db;
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                margin-top: 20px;
-            }
-
-            .btn:hover {
-                background: #2980b9;
+                color: #1a7f64;
+                margin-bottom: 15px;
             }
 
             .status {
-                color: #27ae60;
+                color: #1a7f64;
+                font-weight: 600;
                 margin: 20px 0;
+            }
+
+            p {
+                color: #64748b;
+                line-height: 1.6;
             }
 
             .links {
                 display: flex;
-                gap: 20px;
+                gap: 15px;
                 justify-content: center;
-                margin-top: 30px;
+                margin-top: 35px;
                 flex-wrap: wrap;
             }
 
             .links a {
-                padding: 12px 30px;
-                border-radius: 5px;
+                display: inline-block;
+                min-width: 140px;
+                padding: 13px 25px;
+                border-radius: 9px;
                 text-decoration: none;
-            }
-
-            .btn-doctor {
-                background: #3498db;
                 color: white;
+                font-weight: 600;
+                font-size: 15px;
+                box-shadow: 0 5px 15px rgba(26, 127, 100, 0.18);
+                transition: all 0.25s ease;
             }
 
-            .btn-patient {
-                background: #2ecc71;
-                color: white;
+            .links a:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(26, 127, 100, 0.25);
             }
 
-            .btn-staff {
-                background: #9b59b6;
-                color: white;
-            }
-
-            .btn-prescription {
-                background: #e67e22;
-                color: white;
-            }
-
-            .btn-dashboard {
-                background: #1a7f64;
-                color: white;
-            }
-
-            .btn-dashboard:hover {
-                background: #136b53;
-            }
         </style>
     </head>
 
@@ -177,45 +168,52 @@ async def home():
 
         <div class="container">
 
-            <h1>🏥 Hospital Management System</h1>
+            <h1>Hospital Management System</h1>
 
             <div class="status">
-                ✅ System is Running
+                Powered By Ali Ahmed
             </div>
 
             <p>
                 Manage your hospital staff, patients,
-                appointments, billing and prescriptions efficiently
+                appointments, billing and prescriptions efficiently.
             </p>
 
             <div class="links">
 
-                <a href="/doctors" class="btn-doctor">
-                    👨‍⚕️ Doctors
+                <a href="/dashboard"
+                   style="background: linear-gradient(135deg, #1a7f64, #27ae8f);">
+                    Dashboard
                 </a>
 
-                <a href="/patients" class="btn-patient">
-                    👥 Patients
+                <a href="/doctors"
+                   style="background: linear-gradient(135deg, #12664f, #1a7f64);">
+                    Doctors
                 </a>
 
-                <a href="/staff" class="btn-staff">
-                    👔 Staff
+                <a href="/patients"
+                   style="background: linear-gradient(135deg, #17805f, #2bb673);">
+                    Patients
                 </a>
 
-                <a href="/appointments" class="btn" style="background:#e67e22;">
-                    📅 Appointments
+                <a href="/staff"
+                   style="background: linear-gradient(135deg, #145a4a, #218c70);">
+                    Staff
                 </a>
 
-                <a href="/billing" class="btn" style="background:#8e44ad;">
-                    💰 Billing
+                <a href="/appointments"
+                   style="background: linear-gradient(135deg, #16745f, #35a88a);">
+                    Appointments
                 </a>
 
-                <a href="/prescriptions" class="btn-prescription">
-                    💊 Prescriptions
+                <a href="/billing"
+                   style="background: linear-gradient(135deg, #155c52, #249b83);">
+                    Billing
                 </a>
 
-                <a href="/dashboard" class="btn-dashboard">
-                    📊 Dashboard
+                <a href="/prescriptions"
+                   style="background: linear-gradient(135deg, #0f6b58, #20a486);">
+                    Prescriptions
                 </a>
 
             </div>
@@ -223,15 +221,20 @@ async def home():
         </div>
 
     </body>
+
     </html>
     """
 
 
-# Database Test
+# ================================================================
+# DATABASE TEST
+# ================================================================
+
 @app.get("/db-test")
 def db_test():
 
     try:
+
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
 
@@ -278,7 +281,7 @@ async def dashboard(
     ).count()
 
     # --------------------------------
-    # 3. Total Revenue (Paid Bills)
+    # 3. Total Revenue
     # --------------------------------
 
     total_revenue = db.query(
@@ -300,31 +303,41 @@ async def dashboard(
         Appointment.status
     ).all()
 
-    # Agar koi data nahi hai toh default show karein
     if not appointment_status:
-        appointment_status = [('No Appointments', 0)]
+        appointment_status = [
+            ("No Appointments", 0)
+        ]
 
     # --------------------------------
-    # 5. Monthly Appointment Trends (Last 6 Months)
+    # 5. Monthly Appointment Trends
     # --------------------------------
 
     monthly_data = []
+
     today = date.today()
 
     for i in range(5, -1, -1):
-        # Month calculation
-        month_date = today.replace(day=1)
-        month_date = month_date - timedelta(days=30 * i)
 
-        month_start = month_date.replace(day=1)
+        month_date = today.replace(day=1)
+
+        # Move backwards month by month
+        for _ in range(i):
+            month_date = (
+                month_date - timedelta(days=1)
+            ).replace(day=1)
+
+        month_start = month_date
 
         if month_date.month == 12:
+
             month_end = month_date.replace(
                 year=month_date.year + 1,
                 month=1,
                 day=1
             ) - timedelta(days=1)
+
         else:
+
             month_end = month_date.replace(
                 month=month_date.month + 1,
                 day=1
@@ -336,32 +349,32 @@ async def dashboard(
         ).count()
 
         monthly_data.append({
-            'month': month_start.strftime('%b'),
-            'count': count
+            "month": month_start.strftime("%b"),
+            "count": count
         })
 
     # --------------------------------
-    # 6. Additional Stats (Optional)
+    # 6. Additional Stats
     # --------------------------------
 
-    # Total Bills
     total_bills = db.query(Bill).count()
 
-    # Pending Bills
     pending_bills = db.query(Bill).filter(
-        Bill.payment_status == 'unpaid'
+        Bill.payment_status == "unpaid"
     ).count()
 
-    # Total Prescriptions
-    total_prescriptions = db.query(Prescription).count()
+    total_prescriptions = db.query(
+        Prescription
+    ).count()
 
-    # Active Prescriptions
-    active_prescriptions = db.query(Prescription).filter(
+    active_prescriptions = db.query(
+        Prescription
+    ).filter(
         Prescription.is_active == True
     ).count()
 
     # --------------------------------
-    # Render Dashboard Template
+    # Render Dashboard
     # --------------------------------
 
     return templates.TemplateResponse(
@@ -369,7 +382,6 @@ async def dashboard(
         {
             "request": request,
 
-            # Stats
             "total_doctors": total_doctors,
             "total_patients": total_patients,
             "total_staff": total_staff,
@@ -377,17 +389,14 @@ async def dashboard(
             "today_appointments": today_appointments,
             "total_revenue": total_revenue,
 
-            # Charts Data
             "appointment_status": appointment_status,
             "monthly_data": monthly_data,
 
-            # Extra Stats
             "total_bills": total_bills,
             "pending_bills": pending_bills,
             "total_prescriptions": total_prescriptions,
             "active_prescriptions": active_prescriptions,
 
-            # Date
             "today": today
         }
     )
