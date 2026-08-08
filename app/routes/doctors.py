@@ -90,6 +90,7 @@ async def edit_doctor_form(request: Request, doctor_id: int, db: Session = Depen
     return templates.TemplateResponse("doctors/edit.html", {
         "request": request,
         "doctor": doctor,
+        "doctor_code": doctor.doctor_code,  # Add this line
         "title": "Edit Doctor"
     })
 
